@@ -38,8 +38,8 @@ import com.telenav.kivakit.primitive.collections.map.split.SplitLongToIntMap;
 import com.telenav.kivakit.resource.compression.archive.FieldArchive;
 import com.telenav.kivakit.resource.compression.archive.KivaKitArchivedField;
 import com.telenav.kivakit.resource.compression.archive.ZipArchive;
-import com.telenav.kivakit.serialization.core.SerializationSession;
-import com.telenav.kivakit.serialization.core.SerializationSessionFactory;
+import com.telenav.kivakit.serialization.core.BinarySerializationSession;
+import com.telenav.kivakit.serialization.core.BinarySerializationSessionFactory;
 import com.telenav.mesakit.graph.Graph;
 import com.telenav.mesakit.graph.Metadata;
 import com.telenav.mesakit.graph.Place;
@@ -237,7 +237,7 @@ public class WorldGraphIndex implements Named, Serializable, NamedObject
             file = file.materialized(ProgressReporter.NULL);
 
             // Attach the zip archive and the field archive based on it
-            archive = new FieldArchive(file, SerializationSessionFactory.threadLocal(), ProgressReporter.NULL, READ);
+            archive = new FieldArchive(file, BinarySerializationSessionFactory.threadLocal(), ProgressReporter.NULL, READ);
 
             // Clear out fields we will load from archive
             clearLazyLoadedFields();
@@ -246,7 +246,7 @@ public class WorldGraphIndex implements Named, Serializable, NamedObject
             {
                 // Load archived fields
                 var version = archive.version();
-                VersionedObject<Metadata> metadata = archive.zip().load(SerializationSession.threadLocal(LOGGER), "metadata");
+                VersionedObject<Metadata> metadata = archive.zip().load(BinarySerializationSession.threadLocal(LOGGER), "metadata");
                 if (metadata != null)
                 {
                     this.metadata = metadata.get();
@@ -335,7 +335,7 @@ public class WorldGraphIndex implements Named, Serializable, NamedObject
         try
         {
             // Create archive and save all non-null archived fields
-            var archive = new FieldArchive(file, SerializationSessionFactory.threadLocal(), ProgressReporter.NULL, WRITE);
+            var archive = new FieldArchive(file, BinarySerializationSessionFactory.threadLocal(), ProgressReporter.NULL, WRITE);
             var version = GraphArchive.VERSION;
             archive.version(version);
             archive.save("metadata", new VersionedObject<>(version, metadata));

@@ -49,7 +49,7 @@ import com.telenav.kivakit.network.http.secure.SecureHttpNetworkLocation;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.compression.archive.ZipArchive;
 import com.telenav.kivakit.resource.path.FileName;
-import com.telenav.kivakit.serialization.core.SerializationSession;
+import com.telenav.kivakit.serialization.core.BinarySerializationSession;
 import com.telenav.kivakit.serialization.kryo.KryoSerializationSession;
 import com.telenav.lexakai.annotations.UmlClassDiagram;
 import com.telenav.lexakai.annotations.associations.UmlAggregation;
@@ -101,7 +101,7 @@ import static com.telenav.kivakit.kernel.data.validation.ensure.Ensure.ensureEqu
 import static com.telenav.kivakit.kernel.data.validation.ensure.Ensure.fail;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.Mode.READ;
-import static com.telenav.kivakit.serialization.core.SerializationSession.Type.RESOURCE;
+import static com.telenav.kivakit.serialization.core.BinarySerializationSession.Type.RESOURCE;
 import static com.telenav.mesakit.map.data.formats.pbf.processing.PbfDataProcessor.Action.ACCEPTED;
 import static com.telenav.mesakit.map.data.formats.pbf.processing.PbfDataProcessor.Action.DISCARDED;
 
@@ -153,17 +153,17 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
 
     public static class Settings<R extends Region<R>>
     {
-        private Class<R> type;
-
-        private RegionFactory<R> regionFactory;
-
-        private Extractor<R, PbfWay> regionExtractor;
-
         private Maximum maximumObjects;
 
         private Maximum maximumPolygonsPerObject;
 
         private Area minimumBorderArea;
+
+        private Extractor<R, PbfWay> regionExtractor;
+
+        private RegionFactory<R> regionFactory;
+
+        private Class<R> type;
 
         public Settings()
         {
@@ -259,6 +259,11 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
     }
 
     /**
+     * Cache of region identities to preload
+     */
+    private final RegionIdentityCache<T> identityCache;
+
+    /**
      * RTree spatial index of polygons so we can test only the minimum number of polygon outlines when locating an
      * object for a location
      */
@@ -269,11 +274,6 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
      * Polygon borders for each object
      */
     private final MultiMap<Region<T>, Polygon> polygonsForRegion;
-
-    /**
-     * Cache of region identities to preload
-     */
-    private final RegionIdentityCache<T> identityCache;
 
     /**
      * Settings for the cache
@@ -634,7 +634,7 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
                     // Read the spatial index
                     var session = serializationSession();
                     session.open(RESOURCE, KivaKit.get().projectVersion(), in);
-                    var loaded = session.read();
+                    var loaded = session.readVersionedObject();
                     var cachedIndex = (BorderSpatialIndex<T>) loaded.get();
                     var version = loaded.version();
                     trace("Cached border index is version $", version);
@@ -964,7 +964,7 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
         {
             var serialization = serializationSession();
             serialization.open(RESOURCE, KivaKit.get().projectVersion(), in);
-            var index = serialization.read();
+            var index = serialization.readVersionedObject();
             ensureEqual(index.version(), RegionProject.get().borderDataVersion());
             ensureEqual(index.get(), index());
         }
@@ -979,10 +979,10 @@ public abstract class BorderCache<T extends Region<T>> extends BaseRepeater
     }
 
     @SuppressWarnings({ "unchecked" })
-    private SerializationSession serializationSession()
+    private BinarySerializationSession serializationSession()
     {
         // Get a serialization session for this thread,
-        var session = SerializationSession.threadLocal(debug().listener());
+        var session = BinarySerializationSession.threadLocal(debug().listener());
 
         // and if it's a kryo session,
         if (session instanceof KryoSerializationSession)

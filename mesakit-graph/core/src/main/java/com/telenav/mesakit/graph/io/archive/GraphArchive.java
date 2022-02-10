@@ -43,8 +43,8 @@ import com.telenav.kivakit.resource.compression.archive.ZipArchive;
 import com.telenav.kivakit.resource.compression.archive.ZipEntry;
 import com.telenav.kivakit.resource.path.Extension;
 import com.telenav.kivakit.resource.path.FileName;
-import com.telenav.kivakit.serialization.core.SerializationSession;
-import com.telenav.kivakit.serialization.core.SerializationSessionFactory;
+import com.telenav.kivakit.serialization.core.BinarySerializationSession;
+import com.telenav.kivakit.serialization.core.BinarySerializationSessionFactory;
 import com.telenav.mesakit.graph.Graph;
 import com.telenav.mesakit.graph.Metadata;
 import com.telenav.mesakit.graph.collections.GraphList;
@@ -188,7 +188,7 @@ public class GraphArchive extends FieldArchive implements Named
     public GraphArchive(Listener listener, File file, ZipArchive.Mode mode,
                         ProgressReporter reporter)
     {
-        super(file, SerializationSessionFactory.threadLocal(), reporter, mode);
+        super(file, BinarySerializationSessionFactory.threadLocal(), reporter, mode);
         listener.listenTo(this);
     }
 
@@ -227,7 +227,7 @@ public class GraphArchive extends FieldArchive implements Named
 
     public Metadata metadata()
     {
-        VersionedObject<Metadata> metadata = zip().load(SerializationSession.threadLocal(LOGGER), "metadata");
+        VersionedObject<Metadata> metadata = zip().load(BinarySerializationSession.threadLocal(LOGGER), "metadata");
         return metadata == null ? null : metadata.get();
     }
 
@@ -253,7 +253,7 @@ public class GraphArchive extends FieldArchive implements Named
     public void saveMetadata(Metadata metadata)
     {
         metadata.assertValid(ValidationType.VALIDATE_ALL);
-        zip().save(SerializationSession.threadLocal(LOGGER), "metadata", new VersionedObject<>(VERSION, metadata));
+        zip().save(BinarySerializationSession.threadLocal(LOGGER), "metadata", new VersionedObject<>(VERSION, metadata));
     }
 
     @Override

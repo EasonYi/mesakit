@@ -23,7 +23,7 @@ import com.telenav.kivakit.kernel.language.collections.set.ObjectSet;
 import com.telenav.kivakit.kernel.language.objects.Lazy;
 import com.telenav.kivakit.kernel.language.values.version.Version;
 import com.telenav.kivakit.kernel.project.Project;
-import com.telenav.kivakit.serialization.core.SerializationSessionFactory;
+import com.telenav.kivakit.serialization.core.BinarySerializationSessionFactory;
 import com.telenav.mesakit.graph.GraphProject;
 import com.telenav.mesakit.graph.world.project.WorldGraphKryoTypes;
 
@@ -38,7 +38,7 @@ public class WorldGraphProject extends Project
 
     protected WorldGraphProject()
     {
-        SerializationSessionFactory.threadLocal(new WorldGraphKryoTypes().sessionFactory());
+        BinarySerializationSessionFactory.threadLocal(new WorldGraphKryoTypes().sessionFactory());
     }
 
     @Override

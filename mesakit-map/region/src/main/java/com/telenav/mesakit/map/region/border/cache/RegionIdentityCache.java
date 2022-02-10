@@ -25,7 +25,7 @@ import com.telenav.kivakit.kernel.language.values.count.Count;
 import com.telenav.kivakit.kernel.language.values.version.Version;
 import com.telenav.kivakit.kernel.language.values.version.VersionedObject;
 import com.telenav.kivakit.kernel.messaging.repeaters.BaseRepeater;
-import com.telenav.kivakit.serialization.core.SerializationSession;
+import com.telenav.kivakit.serialization.core.BinarySerializationSession;
 import com.telenav.mesakit.core.MesaKit;
 import com.telenav.mesakit.map.region.Region;
 import com.telenav.mesakit.map.region.RegionIdentity;
@@ -34,7 +34,7 @@ import com.telenav.mesakit.map.region.RegionProject;
 import java.io.InputStream;
 import java.util.Set;
 
-import static com.telenav.kivakit.serialization.core.SerializationSession.Type.RESOURCE;
+import static com.telenav.kivakit.serialization.core.BinarySerializationSession.Type.RESOURCE;
 
 /**
  * Holds a set of region identities for a given region type, so they can be quickly loaded, creating a region object for
@@ -54,7 +54,7 @@ public class RegionIdentityCache<T extends Region<T>> extends BaseRepeater
     /**
      * Load the region codes from, the serialized file, file that was created from reading borders.
      */
-    public synchronized boolean load(File cacheFile, SerializationSession session)
+    public synchronized boolean load(File cacheFile, BinarySerializationSession session)
     {
         // We're loading identities
         var region = type().getSimpleName();
@@ -73,7 +73,7 @@ public class RegionIdentityCache<T extends Region<T>> extends BaseRepeater
         return false;
     }
 
-    public synchronized boolean load(InputStream input, SerializationSession session)
+    public synchronized boolean load(InputStream input, BinarySerializationSession session)
     {
         var start = Time.now();
 
@@ -81,7 +81,7 @@ public class RegionIdentityCache<T extends Region<T>> extends BaseRepeater
         var kivakitVersion = session.open(RESOURCE, KivaKit.get().projectVersion(), input);
 
         // read the set of identities
-        VersionedObject<Set<RegionIdentity>> identities = session.read();
+        VersionedObject<Set<RegionIdentity>> identities = session.readVersionedObject();
         if (identities != null)
         {
             trace("Region identities cache file is version $, written by KivaKit version $", identities.version(), kivakitVersion);
@@ -103,7 +103,7 @@ public class RegionIdentityCache<T extends Region<T>> extends BaseRepeater
         return false;
     }
 
-    public void save(SerializationSession session,
+    public void save(BinarySerializationSession session,
                      Version version,
                      Set<RegionIdentity> identities)
     {

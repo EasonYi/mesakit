@@ -35,7 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.telenav.kivakit.serialization.core.SerializationSession.Type.RESOURCE;
+import static com.telenav.kivakit.serialization.core.BinarySerializationSession.Type.RESOURCE;
 
 public class RegionIdentityCacheTest extends RegionUnitTest
 {

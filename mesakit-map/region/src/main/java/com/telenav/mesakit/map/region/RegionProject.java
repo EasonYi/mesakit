@@ -24,7 +24,7 @@ import com.telenav.kivakit.kernel.language.values.version.Version;
 import com.telenav.kivakit.kernel.messaging.Listener;
 import com.telenav.kivakit.kernel.project.Project;
 import com.telenav.kivakit.primitive.collections.project.PrimitiveCollectionsKryoTypes;
-import com.telenav.kivakit.serialization.core.SerializationSessionFactory;
+import com.telenav.kivakit.serialization.core.BinarySerializationSessionFactory;
 import com.telenav.kivakit.serialization.kryo.CoreKernelKryoTypes;
 import com.telenav.kivakit.serialization.kryo.KryoTypes;
 import com.telenav.mesakit.core.MesaKit;
@@ -49,7 +49,7 @@ public class RegionProject extends Project
 
     protected RegionProject()
     {
-        SerializationSessionFactory.threadLocal(KRYO_TYPES.sessionFactory());
+        BinarySerializationSessionFactory.threadLocal(KRYO_TYPES.sessionFactory());
     }
 
     /**

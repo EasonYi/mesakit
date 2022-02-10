@@ -23,7 +23,7 @@ import com.telenav.kivakit.kernel.language.collections.set.ObjectSet;
 import com.telenav.kivakit.kernel.language.objects.Lazy;
 import com.telenav.kivakit.kernel.language.vm.JavaVirtualMachine;
 import com.telenav.kivakit.kernel.project.Project;
-import com.telenav.kivakit.serialization.core.SerializationSessionFactory;
+import com.telenav.kivakit.serialization.core.BinarySerializationSessionFactory;
 import com.telenav.mesakit.core.MesaKit;
 import com.telenav.mesakit.graph.project.GraphKryoTypes;
 import com.telenav.mesakit.map.data.formats.pbf.PbfProject;
@@ -77,7 +77,7 @@ public class GraphProject extends Project
         return graphFolder().folder("overpass").mkdirs();
     }
 
-    public SerializationSessionFactory serializationFactory()
+    public BinarySerializationSessionFactory serializationFactory()
     {
         return new GraphKryoTypes().sessionFactory();
     }
